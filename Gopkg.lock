@@ -32,7 +32,7 @@
   revision = "6cb733c1b04ba02c412af95088c8aefcfe696272"
 
 [[projects]]
-  branch = "loadX509"
+  branch = "master"
   digest = "1:b5d2151bff6408079261b1642f4d71e7920ea274781138e3692eab404cf26744"
   name = "github.com/go-ocf/kit"
   packages = [
@@ -46,7 +46,7 @@
     "security/signer",
   ]
   pruneopts = "UT"
-  revision = "606594e7c6fd30cfdc10bca0ec46b26dcbfb1fe8"
+  revision = "11aa8b543d3e22481dc9b6a834b10a2631682226"
 
 [[projects]]
   digest = "1:bed9d72d596f94e65fff37f4d6c01398074a6bb1c3f3ceff963516bd01db6ff5"
