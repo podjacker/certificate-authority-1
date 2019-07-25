@@ -9,6 +9,7 @@ import (
 	"github.com/go-ocf/kit/log"
 	kit "github.com/go-ocf/kit/net/grpc"
 	"github.com/go-ocf/kit/security"
+	"github.com/go-ocf/kit/security/jwt"
 	ocfSigner "github.com/go-ocf/kit/security/signer"
 	"google.golang.org/grpc"
 )
@@ -19,6 +20,7 @@ type Config struct {
 	SignerCertificate   string        `envconfig:"SIGNER_CERTIFICATE" required:"True"`
 	SignerPrivateKey    string        `envconfig:"SIGNER_PRIVATE_KEY" required:"True"`
 	SignerValidDuration time.Duration `envconfig:"SIGNER_VALID_DURATION" default:"87600h"`
+	JwksUrl             string        `envconfig:"JWKS_URL" required:"True"`
 }
 
 //String return string representation of Config
@@ -59,6 +61,14 @@ func NewRequestHandlerFromConfig(config Config) (*service.RequestHandler, error)
 
 	identitySigner := ocfSigner.NewIdentityCertificateSigner(chainCerts, privateKey, config.SignerValidDuration)
 	signer := ocfSigner.NewBasicCertificateSigner(chainCerts, privateKey, config.SignerValidDuration)
+	validator := NewAuth(config.JwksUrl, "ocf.cert.sign")
 
-	return service.NewRequestHandler(signer, identitySigner), nil
+	return service.NewRequestHandler(signer, identitySigner, validator), nil
+}
+
+func NewAuth(jwksUrl string, scope string) service.AuthFunc {
+	validator := jwt.NewValidator(jwksUrl)
+	return func(token string) error {
+		return validator.ParseWithClaims(token, jwt.NewScopeClaims(scope))
+	}
 }

@@ -11,11 +11,11 @@ func main() {
 	if err := envconfig.Process("", &config); err != nil {
 		log.Fatalf("cannot parse configuration: %v", err)
 	}
-	if server, err := refImpl.Init(config); err != nil {
+	server, err := refImpl.Init(config)
+	if err != nil {
 		log.Fatalf("cannot init server: %v", err)
-	} else {
-		if err = server.Serve(); err != nil {
-			log.Fatalf("unexpected ends: %v", err)
-		}
+	}
+	if err := server.Serve(); err != nil {
+		log.Fatalf("unexpected ends: %v", err)
 	}
 }

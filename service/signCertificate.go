@@ -9,15 +9,13 @@ import (
 )
 
 func (r *RequestHandler) SignCertificate(ctx context.Context, req *pb.SignCertificateRequest) (*pb.SignCertificateResponse, error) {
-	if req.AuthorizationContext == nil {
-		return nil, logAndReturnError(status.Errorf(codes.InvalidArgument, "cannot sign identity certificate: invalid AuthorizationContext"))
+	if err := r.auth(req.GetAuthorizationContext().GetAccessToken()); err != nil {
+		return nil, logAndReturnError(status.Errorf(codes.InvalidArgument, "cannot sign certificate: %v", err))
 	}
-
-	// TODO validate token
 
 	cert, err := r.signer.Sign(ctx, req.CertificateSigningRequest)
 	if err != nil {
-		return nil, logAndReturnError(status.Errorf(codes.InvalidArgument, "cannot sign identity certificate: %v", err))
+		return nil, logAndReturnError(status.Errorf(codes.InvalidArgument, "cannot sign certificate: %v", err))
 	}
 	return &pb.SignCertificateResponse{
 		Certificate: cert,

@@ -10,6 +10,14 @@
   version = "v1.1.1"
 
 [[projects]]
+  digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
   branch = "addRemoveDevice"
   digest = "1:8dfbd46dfd9c6ef3f33f46dd3e6e2d9b6e5195d6ef8767f95ebde78b49bdfc6f"
   name = "github.com/go-ocf/authorization"
@@ -32,8 +40,8 @@
   revision = "6cb733c1b04ba02c412af95088c8aefcfe696272"
 
 [[projects]]
-  branch = "master"
-  digest = "1:b5d2151bff6408079261b1642f4d71e7920ea274781138e3692eab404cf26744"
+  branch = "jwt"
+  digest = "1:8cd836ff331387c6dfd2f830e582265905c422ce47509d9bc12d8d6c17ff697b"
   name = "github.com/go-ocf/kit"
   packages = [
     "codec/cbor",
@@ -43,10 +51,12 @@
     "net/coap",
     "net/grpc",
     "security",
+    "security/jwt",
     "security/signer",
+    "strings",
   ]
   pruneopts = "UT"
-  revision = "11aa8b543d3e22481dc9b6a834b10a2631682226"
+  revision = "6195b8568e33a0cf1945d08d876691d5ab1c00cb"
 
 [[projects]]
   digest = "1:bed9d72d596f94e65fff37f4d6c01398074a6bb1c3f3ceff963516bd01db6ff5"
@@ -91,6 +101,19 @@
   version = "v1.4.0"
 
 [[projects]]
+  digest = "1:aea1c53d4757225e70d19ddd87e7843a25897b3c4f3901a2ab07e04586a5b76a"
+  name = "github.com/lestrrat-go/jwx"
+  packages = [
+    "internal/base64",
+    "internal/option",
+    "jwa",
+    "jwk",
+  ]
+  pruneopts = "UT"
+  revision = "5d60d87d07ddea9874404944870bec81aabcf574"
+  version = "v0.9.0"
+
+[[projects]]
   digest = "1:00ba9fb5c14095829a3c738c8998b2e3d6019002291e41443ecb775f191e8ba2"
   name = "github.com/pion/dtls"
   packages = [
@@ -109,6 +132,14 @@
   pruneopts = "UT"
   revision = "0387f8acdeb20faf48e539e74906dd633851f3a8"
   version = "v0.2.2"
+
+[[projects]]
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
@@ -290,6 +321,7 @@
     "github.com/go-ocf/kit/log",
     "github.com/go-ocf/kit/net/grpc",
     "github.com/go-ocf/kit/security",
+    "github.com/go-ocf/kit/security/jwt",
     "github.com/go-ocf/kit/security/signer",
     "github.com/gogo/protobuf/gogoproto",
     "github.com/gogo/protobuf/proto",

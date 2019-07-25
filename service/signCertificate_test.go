@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"testing"
 	"time"
 
@@ -23,6 +24,13 @@ func newBasicSigner(t *testing.T) CertificateSigner {
 	identityIntermediateCAKey, err := x509.ParseECPrivateKey(identityIntermediateCAKeyBlock.Bytes)
 	require.NoError(t, err)
 	return ocfSigner.NewBasicCertificateSigner(identityIntermediateCA, identityIntermediateCAKey, time.Hour*86400)
+}
+
+func auth(token string) error {
+	if token == "" {
+		return fmt.Errorf("missing token")
+	}
+	return nil
 }
 
 func TestRequestHandler_SignCertificate(t *testing.T) {
@@ -56,7 +64,7 @@ func TestRequestHandler_SignCertificate(t *testing.T) {
 		},
 	}
 
-	r := NewRequestHandler(newBasicSigner(t), nil)
+	r := NewRequestHandler(newBasicSigner(t), nil, auth)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

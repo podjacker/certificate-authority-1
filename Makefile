@@ -1,4 +1,4 @@
-default: insecure services test
+default: insecure test
 
 secure:
 	go generate ./vendor/github.com/go-ocf/kit/security
@@ -11,19 +11,6 @@ insecure:
 test:
 	go test ./service ./...
 .PHONY: test
-
-test_docker:
-	docker-compose run --rm golang -e DOCKER=1 make test
-.PHONY: test_docker
-
-services:
-	docker-compose pull zookeeper kafka mongo
-	docker-compose up -d zookeeper kafka mongo
-.PHONY: services
-
-stop:
-	docker-compose down
-.PHONY: stop
 
 proto/get:
 	go get github.com/gogo/protobuf/proto
@@ -63,6 +50,3 @@ clean:
 	@find . -name \.coverage.txt -type f -delete
 	@rm -f gover.coverage
 .PHONY: clean
-
-
-
