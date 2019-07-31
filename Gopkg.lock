@@ -19,17 +19,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8dfbd46dfd9c6ef3f33f46dd3e6e2d9b6e5195d6ef8767f95ebde78b49bdfc6f"
-  name = "github.com/go-ocf/authorization"
-  packages = [
-    "oauth",
-    "oauth/test",
-  ]
-  pruneopts = "UT"
-  revision = "34192ff347ecf329caa7656bcefe004487908766"
-
-[[projects]]
-  branch = "master"
   digest = "1:08c56a9321e118147e6f8e1ef18bb6647f5aefa611dbd73f9849efac653e245e"
   name = "github.com/go-ocf/go-coap"
   packages = [
@@ -41,7 +30,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:167ddb8441cf7a8a962a2a80b096d5c189bc5df93805ea2077ac9309e5441d2b"
+  digest = "1:3aa58dfc6b3ef9e35d7e5a385493da13fa867d886ab5b53a270a1468ba64a1a7"
   name = "github.com/go-ocf/kit"
   packages = [
     "codec/cbor",
@@ -57,7 +46,7 @@
     "strings",
   ]
   pruneopts = "UT"
-  revision = "093c61375de9991fc66fbd228d3ac2f3b60ca026"
+  revision = "79d150f28914a2541a6e7a3989b158f415edf4db"
 
 [[projects]]
   digest = "1:bed9d72d596f94e65fff37f4d6c01398074a6bb1c3f3ceff963516bd01db6ff5"
@@ -182,12 +171,12 @@
   version = "v1.1.7"
 
 [[projects]]
-  digest = "1:a5158647b553c61877aa9ae74f4015000294e47981e6b8b07525edcbb0747c81"
+  digest = "1:777e729b475d3895c7229552aa10076f0d177daf37c0a72258006d046d329960"
   name = "go.uber.org/atomic"
   packages = ["."]
   pruneopts = "UT"
-  revision = "df976f2515e274675050de7b3f42545de80594fd"
-  version = "v1.4.0"
+  revision = "4e336646b2ef9fc6e47be8e21594178f98e5ebcf"
+  version = "v1.2.0"
 
 [[projects]]
   digest = "1:60bf2a5e347af463c42ed31a493d817f8a72f102543060ed992754e689805d1a"
@@ -243,14 +232,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f99b0e9035cf86cdc14cb2848308e831193d5e19ab9a23a8493cd925bdc3952b"
+  digest = "1:6f4db4018547b0c19aa51a66ea3a5eed800cc5e2de9df6490a37b14d06155f22"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "fc99dfbffb4e5ed5758a37e31dd861afe285406b"
+  revision = "1393eb0183657fb29200106b17a5042ec6e48dbe"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -331,10 +320,10 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/go-ocf/authorization/oauth/test",
     "github.com/go-ocf/kit/log",
     "github.com/go-ocf/kit/net/grpc",
     "github.com/go-ocf/kit/security",
+    "github.com/go-ocf/kit/security/jwt",
     "github.com/go-ocf/kit/security/signer",
     "github.com/gogo/protobuf/gogoproto",
     "github.com/gogo/protobuf/proto",

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-ocf/certificate-authority/pb"
+	"github.com/go-ocf/kit/net/grpc"
 )
 
 type IdentityCertificateSigner struct {
@@ -16,12 +17,7 @@ func NewIdentityCertificateSigner(client pb.CertificateAuthorityClient, accessTo
 }
 
 func (s *IdentityCertificateSigner) Sign(ctx context.Context, csr []byte) (signedCsr []byte, err error) {
-	req := pb.SignCertificateRequest{
-		CertificateSigningRequest: csr,
-		AuthorizationContext: &pb.AuthorizationContext{
-			AccessToken: s.accessToken,
-		},
-	}
-	resp, err := s.client.SignIdentityCertificate(ctx, &req)
+	req := pb.SignCertificateRequest{CertificateSigningRequest: csr}
+	resp, err := s.client.SignIdentityCertificate(grpc.CtxWithToken(ctx, s.accessToken), &req)
 	return resp.GetCertificate(), err
 }
