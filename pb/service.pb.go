@@ -9,8 +9,6 @@ import (
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -23,7 +21,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 func init() { proto.RegisterFile("pb/service.proto", fileDescriptor_6ff5ab49d8a5fcc4) }
 
@@ -99,17 +97,6 @@ type CertificateAuthorityServer interface {
 	// SignCertificate sends a Certificate Signing Request to the certificate authority
 	// and obtains a signed certificate. Both in the PEM format.
 	SignCertificate(context.Context, *SignCertificateRequest) (*SignCertificateResponse, error)
-}
-
-// UnimplementedCertificateAuthorityServer can be embedded to have forward compatible implementations.
-type UnimplementedCertificateAuthorityServer struct {
-}
-
-func (*UnimplementedCertificateAuthorityServer) SignIdentityCertificate(ctx context.Context, req *SignCertificateRequest) (*SignCertificateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SignIdentityCertificate not implemented")
-}
-func (*UnimplementedCertificateAuthorityServer) SignCertificate(ctx context.Context, req *SignCertificateRequest) (*SignCertificateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SignCertificate not implemented")
 }
 
 func RegisterCertificateAuthorityServer(s *grpc.Server, srv CertificateAuthorityServer) {

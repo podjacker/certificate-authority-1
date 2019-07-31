@@ -20,7 +20,6 @@ proto/get:
 .PHONY: proto/get
 
 proto/generate:
-	protoc -I=. -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf --gogofaster_out=${GOPATH}/src pb/authorization.proto
 	protoc -I=. -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf --gogofaster_out=${GOPATH}/src pb/cert.proto
 	protoc -I=. -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf --go_out=plugins=grpc:${GOPATH}/src pb/service.proto
 .PHONY: proto/generate

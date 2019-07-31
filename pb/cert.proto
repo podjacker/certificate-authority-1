@@ -2,14 +2,12 @@ syntax = "proto3";
 
 package ocf.cloud.certificateauthority.pb;
 
-import "github.com/go-ocf/certificate-authority/pb/authorization.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 option go_package = "github.com/go-ocf/certificate-authority/pb;pb";
 
 message SignCertificateRequest {
     bytes certificate_signing_request = 1; // PEM format
-    AuthorizationContext authorization_context = 2;
 }
 
 message SignCertificateResponse {

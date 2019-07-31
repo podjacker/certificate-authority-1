@@ -1,6 +1,7 @@
 package refImpl
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -11,7 +12,6 @@ import (
 	"github.com/go-ocf/kit/security"
 	"github.com/go-ocf/kit/security/jwt"
 	ocfSigner "github.com/go-ocf/kit/security/signer"
-	"google.golang.org/grpc"
 )
 
 type Config struct {
@@ -31,20 +31,22 @@ func (c Config) String() string {
 
 func Init(config Config) (*kit.Server, error) {
 	log.Setup(config.Log)
-
 	log.Info(config.String())
+
+	cfg := kit.Config{Addr: config.Service.Addr, TLSConfig: config.Service.TLSConfig}
+	auth := NewAuth(config.JwksUrl, "ocf.cert.sign")
+
+	svr, err := kit.NewServerWithoutPeerVerification(cfg, auth.Stream(), auth.Unary())
+	if err != nil {
+		return nil, err
+	}
 
 	handler, err := NewRequestHandlerFromConfig(config)
 	if err != nil {
 		return nil, err
 	}
-	cfg := kit.Config{Addr: config.Service.Addr, TLSConfig: config.Service.TLSConfig}
-	svr, err := kit.NewServer(cfg, func(s *grpc.Server) {
-		service.Register(s, handler)
-	})
-	if err != nil {
-		return nil, err
-	}
+	service.Register(svr.Server, handler)
+
 	return svr, nil
 }
 
@@ -61,14 +63,11 @@ func NewRequestHandlerFromConfig(config Config) (*service.RequestHandler, error)
 
 	identitySigner := ocfSigner.NewIdentityCertificateSigner(chainCerts, privateKey, config.SignerValidDuration)
 	signer := ocfSigner.NewBasicCertificateSigner(chainCerts, privateKey, config.SignerValidDuration)
-	validator := NewAuth(config.JwksUrl, "ocf.cert.sign")
-
-	return service.NewRequestHandler(signer, identitySigner, validator), nil
+	return service.NewRequestHandler(signer, identitySigner), nil
 }
 
-func NewAuth(jwksUrl string, scope string) service.AuthFunc {
-	validator := jwt.NewValidator(jwksUrl)
-	return func(token string) error {
-		return validator.ParseWithClaims(token, jwt.NewScopeClaims(scope))
-	}
+func NewAuth(jwksUrl string, scope string) kit.AuthInterceptors {
+	return kit.MakeJWTInterceptors(jwksUrl, func(context.Context) kit.Claims {
+		return jwt.NewScopeClaims(scope)
+	})
 }

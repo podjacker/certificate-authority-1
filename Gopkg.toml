@@ -1,9 +1,5 @@
 [[constraint]]
-  name = "github.com/go-ocf/authorization"
-  branch = "addRemoveDevice"
-
-[[override]]
-  branch = "jwt"
+  branch = "master"
   name = "github.com/go-ocf/kit"
 
 [[constraint]]

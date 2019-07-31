@@ -13,13 +13,10 @@ type CertificateSigner interface {
 	Sign(ctx context.Context, csr []byte) ([]byte, error)
 }
 
-type AuthFunc = func(token string) error
-
 // RequestHandler handles incoming requests.
 type RequestHandler struct {
 	identitySigner CertificateSigner
 	signer         CertificateSigner
-	auth           AuthFunc
 }
 
 // Register registers the handler instance with a gRPC server.
@@ -30,12 +27,10 @@ func Register(server *grpc.Server, handler *RequestHandler) {
 // NewRequestHandler factory for new RequestHandler.
 func NewRequestHandler(
 	signer, identitySigner CertificateSigner,
-	auth AuthFunc,
 ) *RequestHandler {
 	return &RequestHandler{
 		signer:         signer,
 		identitySigner: identitySigner,
-		auth:           auth,
 	}
 }
 

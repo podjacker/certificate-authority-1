@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	authTest "github.com/go-ocf/authorization/oauth/test"
 	"github.com/go-ocf/certificate-authority/pb"
 	ocfSigner "github.com/go-ocf/kit/security/signer"
 	"github.com/stretchr/testify/require"
@@ -46,9 +45,6 @@ func TestRequestHandler_SignIdentityCertificate(t *testing.T) {
 			name: "valid",
 			args: args{
 				req: &pb.SignCertificateRequest{
-					AuthorizationContext: &pb.AuthorizationContext{
-						AccessToken: authTest.UserToken,
-					},
 					CertificateSigningRequest: testCSR,
 				},
 			},
@@ -56,7 +52,7 @@ func TestRequestHandler_SignIdentityCertificate(t *testing.T) {
 		},
 	}
 
-	r := NewRequestHandler(nil, newIdentitySigner(t), auth)
+	r := NewRequestHandler(nil, newIdentitySigner(t))
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

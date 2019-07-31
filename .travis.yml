@@ -6,8 +6,6 @@ services:
 install:                                                                 
   - docker build . --network=host -t certificate-authority:build-secure --target build-secure
   - docker build . --network=host -t certificate-authority:build-insecure --target build-insecure
-  - docker-compose pull zookeeper kafka mongo
-  - docker-compose up -d zookeeper kafka mongo
 
 jobs:
   include:
