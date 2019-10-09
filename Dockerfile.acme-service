@@ -6,7 +6,7 @@ WORKDIR $GOPATH/src/github.com/go-ocf/certificate-authority
 COPY . .
 
 RUN dep ensure -v --vendor-only
-RUN go build -o /go/bin/service ./cmd/service
+RUN go build -o /go/bin/service ./cmd/acme-service
 
 FROM alpine:3.10 as service
 RUN apk add --no-cache ca-certificates

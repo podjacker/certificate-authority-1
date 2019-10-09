@@ -1,51 +1,76 @@
-default: insecure test
+SHELL = /bin/bash
+SERVICE_NAME = $(notdir $(CURDIR))
+LATEST_TAG = vnext
+VERSION_TAG = vnext-$(shell git rev-parse --short=7 --verify HEAD)
 
-secure:
-	go generate ./vendor/github.com/go-ocf/kit/security
-.PHONY: secure
+default: build
 
-insecure:
-	OCF_INSECURE=TRUE go generate ./vendor/github.com/go-ocf/kit/security
-.PHONY: insecure
+define build-docker-image
+	docker build \
+		--network=host \
+		--tag ocfcloud/$(SERVICE_NAME):$(VERSION_TAG) \
+		--tag ocfcloud/$(SERVICE_NAME):$(LATEST_TAG) \
+		--target $(1) \
+		.
+endef
 
-test:
-	go test ./service ./...
-.PHONY: test
+build-testcontainer:
+	$(call build-docker-image,build)
 
-proto/get:
-	go get github.com/gogo/protobuf/proto
-	go get github.com/gogo/protobuf/protoc-gen-gogofaster
-	go get github.com/gogo/protobuf/gogoproto
-	export PATH=${PATH}:${GOPATH}/bin
-.PHONY: proto/get
+build-servicecontainer:
+	$(call build-docker-image,service)
+
+build: build-testcontainer build-servicecontainer
+
+make-ca:
+	docker pull smallstep/step-ca
+	mkdir -p ./test/step-ca/data/secrets
+	echo "password" > ./test/step-ca/data/secrets/password
+	docker run \
+		-it \
+		-v "$(shell pwd)"/test/step-ca/data:/home/step --user $(shell id -u):$(shell id -g) \
+		smallstep/step-ca \
+		/bin/bash -c "step ca init -dns localhost -address=:10443 -provisioner=test@localhost -name test -password-file ./secrets/password && step ca provisioner add acme --type ACME"
+
+run-ca:
+	docker run \
+		-d \
+		--network=host \
+		--name=step-ca-test \
+		-v /etc/nsswitch.conf:/etc/nsswitch.conf \
+		-v "$(shell pwd)"/test/step-ca/data:/home/step --user $(shell id -u):$(shell id -g) \
+		smallstep/step-ca
+
+test: clean make-ca run-ca build-testcontainer
+	docker run \
+		--network=host \
+		-v $(shell pwd)/test/step-ca/data/certs/root_ca.crt:/root_ca.crt \
+		-e DIAL_ACME_CA_POOL=/root_ca.crt \
+		-e DIAL_ACME_DOMAINS="localhost" \
+		-e DIAL_ACME_DIRECTORY_URL="https://localhost:10443/acme/acme/directory" \
+		-e LISTEN_ACME_CA_POOL=/root_ca.crt \
+		-e LISTEN_ACME_DOMAINS="localhost" \
+		-e LISTEN_ACME_DIRECTORY_URL="https://localhost:10443/acme/acme/directory" \
+		--mount type=bind,source="$(shell pwd)",target=/shared \
+		ocfcloud/$(SERVICE_NAME):$(VERSION_TAG) \
+		go test -v ./... -covermode=atomic -coverprofile=/shared/coverage.txt
+
+push: build-servicecontainer
+	docker push ocfcloud/$(SERVICE_NAME):$(VERSION_TAG)
+	docker push ocfcloud/$(SERVICE_NAME):$(LATEST_TAG)
+
+clean:
+	docker rm -f step-ca-test || true
+	rm -rf ./test/step-ca || true
 
 proto/generate:
 	protoc -I=. -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf --gogofaster_out=${GOPATH}/src pb/cert.proto
 	protoc -I=. -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf --go_out=plugins=grpc:${GOPATH}/src pb/service.proto
-.PHONY: proto/generate
+
+.PHONY: build-testcontainer build-servicecontainer build test push clean proto/generate make-ca
 
 
-deps:
-	go get -v -t ./...
-.PHONE: deps
 
-build: deps
-	go build
-.PHONY: build
 
-publish-coverage:
-	curl -s https://codecov.io/bash > .codecov && \
-	chmod +x .codecov && \
-	./.codecov -f coverage.txt
-.PHONY: publish-coverage
 
-cover:
-	go generate ./...
-	go test ./service -race -covermode=atomic -coverprofile=coverage.txt
-.PHONY: cover
 
-clean:
-	@find . -name \.covdecov -type f -delete
-	@find . -name \.coverage.txt -type f -delete
-	@rm -f gover.coverage
-.PHONY: clean

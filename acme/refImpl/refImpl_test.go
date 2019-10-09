@@ -5,28 +5,65 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
-	"github.com/kelseyhightower/envconfig"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestInit(t *testing.T) {
-	var config Config
 	dir, err := ioutil.TempDir("", "gotesttmp")
 	require.NoError(t, err)
 	defer os.RemoveAll(dir)
-	testSignerCerts(t, dir)
-	os.Setenv("JWKS_URL", "test.com")
-	err = envconfig.Process("", &config)
-	require.NoError(t, err)
+	var cfg Config
+	cfg = testSignerCerts(t, dir, cfg)
 
-	got, err := Init(config)
-	require.NoError(t, err)
-	require.NotEmpty(t, got)
+	type args struct {
+		config Config
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantServer bool
+		wantErr    bool
+	}{
+		{
+			name:    "invalid",
+			wantErr: true,
+		},
+		{
+			name: "valid",
+			args: args{
+				config: Config{
+					SignerCertificate:   cfg.SignerCertificate,
+					SignerPrivateKey:    cfg.SignerPrivateKey,
+					SignerValidDuration: time.Hour * 10,
+					Addr:                ":1234",
+				},
+			},
+			wantServer: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Init(tt.args.config)
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			if tt.wantServer {
+				assert.NotEmpty(t, got)
+			} else {
+				assert.Empty(t, got)
+
+			}
+		})
+	}
 }
 
-func testSignerCerts(t *testing.T, dir string) {
+func testSignerCerts(t *testing.T, dir string, cfg Config) Config {
 	crt := filepath.Join(dir, "cert.crt")
 	if err := ioutil.WriteFile(crt, IdentityIntermediateCA, 0600); err != nil {
 		assert.NoError(t, err)
@@ -35,8 +72,9 @@ func testSignerCerts(t *testing.T, dir string) {
 	if err := ioutil.WriteFile(crtKey, IdentityIntermediateCAKey, 0600); err != nil {
 		assert.NoError(t, err)
 	}
-	os.Setenv("SIGNER_CERTIFICATE", crt)
-	os.Setenv("SIGNER_PRIVATE_KEY", crtKey)
+	cfg.SignerCertificate = crt
+	cfg.SignerPrivateKey = crtKey
+	return cfg
 }
 
 var (
