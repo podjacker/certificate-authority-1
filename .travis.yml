@@ -3,25 +3,16 @@ language: minimal
 services:
   - docker
 
-install:                                                                 
-  - docker build . --network=host -t certificate-authority:build-secure --target build-secure
-  - docker build . --network=host -t certificate-authority:build-insecure --target build-insecure
-
 jobs:
   include:
-    - stage: test
-      if: type == pull_request
-      script: 
-        - docker run --network=host certificate-authority:build-secure go test ./...
-        - docker run --network=host certificate-authority:build-insecure go test ./...
-
-    - stage: test_and_cover
-      if: type != pull_request
-      script: 
-        - >
-            docker run
-            --mount type=bind,source="$(pwd)",target=/shared
-            --network=host
-            certificate-authority:build-insecure
-            go test ./... -covermode=atomic -coverprofile=/shared/coverage.txt
+    - stage: "Test"
+      if: type = pull_request
+      script:
+        - make test
+    - stage: "Test & Publish"
+      if: branch = master AND type != pull_request
+      script:
+        - make test
         - bash <(curl -s https://codecov.io/bash)
+        - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+        - make push
